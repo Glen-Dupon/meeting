@@ -159,6 +159,7 @@ App({
             callback(0, data)
           })
           // 发送 res.code 到后台换取 openId, sessionKey, unionId
+          console.log(res.code)
         },
         fail: res => {
           callback(1, res)

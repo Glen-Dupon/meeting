@@ -1,6 +1,6 @@
 
 "use strict";
-const USE_WEBSOCKET = true
+const USE_WEBSOCKET = false
 const httpCookie = require('./http-cookie.js')
 const ApiViewWS = require('./apiviewws.js')
 let app = getApp()
@@ -15,6 +15,7 @@ const reconnectApiViews = (check_time) => {
 }
 const getApiViewWS = (server, need_connect) => {
   const ws_path = "ws" + server.substring(4) + "/wsapi"
+  // const ws_path = server + "/api"
   return new Promise((resolve, reject) => {
     if (!apiViewWSs.hasOwnProperty(ws_path)) {
       apiViewWSs[ws_path] = new ApiViewWS(ws_path)

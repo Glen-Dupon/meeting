@@ -1,7 +1,7 @@
 "use strict";
 const request = require('./request');
+// const server = 'http://172.16.11.28:8000';
 const server = 'http://127.0.0.1:8000';
-
 const ERROR_CODE = {
   SUCCESS: 0, // 返回成功
   ERROR_UNKNOWN: -1, // 未知错误

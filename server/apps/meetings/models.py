@@ -10,12 +10,11 @@ from core.utils import admin_register
 
 from . import constants
 
-
-@admin_register(addable=False, changeable=False, list_display=['create_user', ])
+@admin_register(addable=True, changeable=False, list_display=['create_user', ])
 class Room(utils.BaseModel):
     name = models.CharField(verbose_name='名称', default='', max_length=64)
     description = models.CharField(verbose_name='描述', default='', max_length=255, blank=True)
-    create_user = utils.ForeignKey(User, verbose_name='创建人', related_name='create_rooms', editable=False)
+    create_user = utils.ForeignKey(User, verbose_name='创建人', related_name='create_rooms', editable=False, default='1001')
     qr_code = models.ImageField('二维码', upload_to="%Y/%m/%d/", max_length=512, null=False, default='', editable=False)
     create_user_manager = models.BooleanField(verbose_name='创建人管理权限', default=False,
                                               help_text='会议室创建人可以管理该会议室内所有会议')

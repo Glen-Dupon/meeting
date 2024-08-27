@@ -9,9 +9,9 @@ from core import utils
 
 from . import biz, models, serializer
 
+# import pdb
 
 site = ViewSite(name='wechat', app_name='wechat')
-
 
 @site
 class Login(utils.APIBase):
@@ -19,7 +19,9 @@ class Login(utils.APIBase):
     response_info_serializer_class = serializer.UserSerializer
 
     def get_context(self, request, *args, **kwargs):
+        print("======================Login=========================")
         session = biz.wechat.wxa.code_to_session(request.params.js_code)
+        # pdb.set_trace()
         wxa_user, new = models.User.objects.get_or_create(openid=session['openid'])
         wxa_user.set_info(session)
         login_user = authenticate(request, openid=wxa_user.openid)

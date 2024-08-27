@@ -17,9 +17,7 @@ from core import utils, constants as core_constants
 
 from . import models, serializer, constants
 
-
 site = ViewSite(name='meetings', app_name='meetings')
-
 
 class BaseView(UserBaseView):
 
@@ -80,6 +78,7 @@ class RoomCreate(mixins.AddMixin, BaseView):
 
     def init_fields(self, request, obj):
         obj.create_user_id = request.user.pk
+        # obj.create_user_id = request.user.pk if request.user.pk else "sysadmin"
         super().init_fields(request, obj)
 
     def save_obj(self, request, obj):
@@ -119,7 +118,7 @@ class RoomBase(BaseView):
 
 @site
 class RoomEdit(RoomBase):
-    name = "修改会议室"
+    name = "修改会议室信息"
     check_manager = True
     response_info_serializer_class = serializer.RoomSerializer
 
@@ -137,7 +136,10 @@ class RoomEdit(RoomBase):
         param_fields = (
             ('name', fields.CharField(label='名称', max_length=64)),
             ('description', fields.CharField(label='描述', max_length=255, allow_blank=True, default="")),
-            ('create_user_manager', fields.NullBooleanField(label='创建人管理权限', default=None)),
+            # ('create_user_manager', fields.NullBooleanField(label='创建人管理权限', default=None)),
+            # default=None 可能导致问题：如果你在不允许 None 值的地方使用了这个字段，可能会导致问题。你需要确保你的代码可以正确处理 None 值。 
+            # ('create_user_manager', fields.BooleanField(null=True, label='创建人管理权限', default=None)),
+            ('create_user_manager', fields.BooleanField(label='创建人管理权限', default=None)),
         )
 
 
@@ -208,17 +210,20 @@ class FollowRooms(BaseView):
 
 @site
 class CreateRooms(BaseView):
-    name = "创建会议室列表"
+    # CreatedRooms
+    name = "创建的会议室列表"
     response_info_serializer_class = serializer.RoomSerializer
     response_many = True
-
+    
+    #context is a list of Room objects
+    #context is a list of Room objects which are created by the current user   
     def get_context(self, request, *args, **kwargs):
         return models.Room.objects.filter(create_user_id=request.user.pk)
 
 
 @site
 class RoomMeetings(BaseView):
-    name = "会议室预约列表"
+    name = "我的会议室预约列表"
 
     @classmethod
     def response_info_data(cls):
@@ -468,7 +473,6 @@ class Cancel(MeetingBase):
 @site
 class Join(MeetingBase):
     name = "参加会议"
-
     def get_context(self, request, *args, **kwargs):
         attendee, _ = models.MeetingAttendee.default_manager.get_or_create(
             meeting_id=request.params.meeting_id,

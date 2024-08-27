@@ -91,7 +91,9 @@ class ChangeLogBase(BaseModel):
                                        null=False, default=0, help_text='正加负减')
 
     class Meta:
-        index_together = ('reason_id', 'reason_type')
+        indexes = [
+            models.Index(fields=['reason_id', 'reason_type']),
+        ]
         abstract = True
 
 
