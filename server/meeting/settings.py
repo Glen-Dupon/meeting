@@ -1,5 +1,6 @@
 # encoding: utf-8
 from __future__ import absolute_import, unicode_literals
+
 """
 Django settings for meeting project.
 
@@ -15,13 +16,13 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 import os
 from django.conf import global_settings
 from kombu import Exchange, Queue
-from rest_framework import ISO_8601
+from rest_framework import ISO_8601  # noqa
 
 from . import local_settings as ls
-from .local_settings import *  # NOQA
+from .local_settings import *
+
 from .constance import CONSTANCE_CONFIG  # NOQA
 from .celery_annotations import celery_annotations_dict
-
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,31 +33,40 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: SECRET_KEY is in local_settings
 
+# 如果 IS_DEBUG 这个环境变量存在并且它的值不等于 '0'，那么 DEBUG 就会被设置为 True。
+# 否则，DEBUG 就会被设置为 False。
+
 DEBUG = os.environ.get('IS_DEBUG', '1') != '0'
 
 ALLOWED_HOSTS = ['*', ]
 
-REDIS_CACHE_URL = 'redis://%s%s@%s:%s/%d' % (
+# redis://[:password]@hostname:port/db
+
+# REDIS_CACHE_URL = 'redis://%s%s%s:%s/%d' % (
+REDIS_CACHE_URL = 'redis://'+'%s%s%s:%s/%d' % (
     ':' if ls.REDIS_PASSWORD else '',
-    ls.REDIS_PASSWORD,
+    ls.REDIS_PASSWORD+'@' if ls.REDIS_PASSWORD else '',
     ls.REDIS_HOST,
     ls.REDIS_PORT,
     ls.REDIS_CACHE_DB)
 
+# REDIS_CACHE_URL = 'redis://127.0.0.1:6379/0'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'cool',
+    # 'channels',
+    # "daphne",
+    'simpleui', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'channels',
     'rest_framework',
     'constance',
-    'cool',
     'apps.wechat',
     'apps.meetings',
 ]
@@ -83,7 +93,12 @@ SESSION_REDIS = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'redis_cache.RedisCache',
+        # Could not find backend 'redis_cache.RedisCache': cannot import name 'six' from 'django.utils'
+        # The docs mention that to use django-redis, you need to use the django_redis backend, not the Django core backend. See the section “Configure as cache backend” at django-redis · PyPI 28
+        
+        # 'BACKEND': 'redis_cache.RedisCache',
+        "BACKEND": "django_redis.cache.RedisCache",
+        
         'LOCATION': [
             '%s:%s' % (ls.REDIS_HOST, ls.REDIS_PORT),
         ],
@@ -102,18 +117,17 @@ CACHES = {
     },
 }
 
-
 WSGI_APPLICATION = 'meeting.wsgi.application'
-ASGI_APPLICATION = "meeting.routing.application"
+ASGI_APPLICATION = 'meeting.routing.application'
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [
-                'redis://%s%s@%s:%s/%d' % (
+                'redis://'+'%s%s%s:%s/%d' % (
                     ':' if ls.REDIS_PASSWORD else '',
-                    ls.REDIS_PASSWORD,
+                    ls.REDIS_PASSWORD+'@' if ls.REDIS_PASSWORD else '',
                     ls.REDIS_HOST,
                     ls.REDIS_PORT,
                     ls.REDIS_CHANNEL_DB
@@ -128,19 +142,31 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': ls.MYSQL_DBNAME,
-        'USER': ls.MYSQL_USERNAME,
-        'PASSWORD': ls.MYSQL_PASSWORD,
-        'HOST': ls.MYSQL_HOST,
-        'PORT': ls.MYSQL_PORT,
-        'TEST_CHARSET': "utf8mb4",
-        'TEST_COLLATION': "utf8mb4_unicode_ci",
-        'STORAGE_ENGINE': 'INNODB',
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
+        
+        #abandoned
+        # 'ENGINE': 'django.db.backends.mysql',
+        
+        # 'ENGINE': 'mysql.connector.django',
+        # 'NAME': ls.MYSQL_DBNAME,
+        # 'USER': ls.MYSQL_USERNAME,
+        # 'PASSWORD': ls.MYSQL_PASSWORD,
+        # 'HOST': ls.MYSQL_HOST,
+        # 'PORT': ls.MYSQL_PORT,
+        # 'TEST_CHARSET': "utf8mb4",
+        # 'TEST_COLLATION': "utf8mb4_unicode_ci",
+        # 'STORAGE_ENGINE': 'INNODB',
+        # 'OPTIONS': {
+        #     'charset': 'utf8mb4',
+        #     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        # },
+
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'meetingdb',
+        'USER': 'postgres',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+
     }
 }
 
@@ -320,9 +346,9 @@ STATICFILES_DIRS = (
 )
 # celery settings
 
-CELERY_BROKER_URL = 'redis://%s%s@%s:%s/%d' % (
+CELERY_BROKER_URL = 'redis://'+'%s%s%s:%s/%d' % (
     ':' if ls.REDIS_PASSWORD else '',
-    ls.REDIS_PASSWORD,
+    ls.REDIS_PASSWORD+'@' if ls.REDIS_PASSWORD else '',
     ls.REDIS_HOST,
     ls.REDIS_PORT,
     ls.REDIS_CELERY_DB)
