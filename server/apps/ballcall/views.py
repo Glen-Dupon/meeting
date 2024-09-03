@@ -77,7 +77,7 @@ class PlaceBase(BaseView):
 class CreatePlace(mixins.AddMixin, BaseView):
     model = models.Place
     response_info_serializer_class = serializer.PlaceSerializer
-    add_fields = ['name', 'description', 'create_user_manager']
+    # add_fields = ['name', 'create_user_manager']
 
     # def init_fields(self, request, obj):
     #     obj.create_user_id = request.user.pk
@@ -140,44 +140,44 @@ class CourtBase(BaseView):
 
 # R U D
 ## create court
-@site
-class CreateCourt(mixins.AddMixin, CourtBase):
-    model = models.Court
-    response_info_serializer_class = serializer.CourtSerializer
-    add_fields = ['name', 'type','num','description']
+# @site
+# class CreateCourt(mixins.AddMixin, CourtBase):
+#     model = models.Court
+#     response_info_serializer_class = serializer.CourtSerializer
+#     # add_fields = ['name', 'type','num','description']
 
 ## retrive court
 @site
 class CourtInfo(CourtBase):
     model = models.Court
     response_info_serializer_class = serializer.CourtSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 ## update court
 @site    
 class editCourt(CourtBase):
     model = models.Court
     response_info_serializer_class = serializer.CourtSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 @site
 class deleteCourt(CourtBase):
     model = models.Court
     response_info_serializer_class = serializer.CourtSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 #user follow court 实际业务中用户是否需要关注场地？
 @site
 class UserFollowCourt(CourtBase):
     model = models.Court
     response_info_serializer_class = serializer.CourtSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 @site
 class UserunFollowCourt(CourtBase):
     model = models.Court
     response_info_serializer_class = serializer.CourtSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 
 '''
@@ -190,7 +190,7 @@ CRUD
 class CreateGameTemplate(mixins.AddMixin, BaseView):
     model = models.GameTemplate
     response_info_serializer_class = serializer.GameTemplateSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 class GameBase(BaseView):
     check_manager = False
@@ -200,20 +200,20 @@ class GameBase(BaseView):
 class GameTemplateInfo(GameBase):
     model = models.GameTemplate
     response_info_serializer_class = serializer.GameTemplateSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 
 @site    
 class editGameTemplate(GameBase):
     model = models.GameTemplate
     response_info_serializer_class = serializer.GameTemplateSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 @site    
 class deleteGameTemplate(GameBase):
     model = models.GameTemplate
     response_info_serializer_class = serializer.GameTemplateSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 '''
 part of game
@@ -225,7 +225,7 @@ CRUD
 class CreateGame(mixins.AddMixin, BaseView):
     model = models.Game
     response_info_serializer_class = serializer.GameTemplateSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 class GameBase(BaseView):
     check_manager = False
@@ -236,14 +236,14 @@ class GameBase(BaseView):
 class GameInfo(GameBase):
     model = models.Game
     response_info_serializer_class = serializer.GameSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 
 @site    
 class editGame(GameBase):
     model = models.Game
     response_info_serializer_class = serializer.GameSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 
 #发起人取消活动
@@ -262,13 +262,13 @@ class CancelGame(GameBase):
 class UserFollowGame(GameBase):
     model = models.Court
     response_info_serializer_class = serializer.GameSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 @site
 class UserunFollowGame(GameBase):
     model = models.Court
     response_info_serializer_class = serializer.GameSerializer
-    add_fields = ['name', 'type','num','description']
+    # add_fields = ['name', 'type','num','description']
 
 #用户参加活动
 @site

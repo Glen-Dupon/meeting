@@ -31,7 +31,7 @@ from core.utils import get_api_js
 api_patterns = [
     # 官方文档没有讲这样的写法：
     path('wechat/', include("apps.wechat.views")),
-    path('ballcall/', include("apps.ballcalls.views")),
+    path('ballcall/', include("apps.ballcall.views")),
 
     # path('wechat/', include("apps.wechat.urls")),
     # path('ballcall/', include("apps.ballcalls.urls")),
