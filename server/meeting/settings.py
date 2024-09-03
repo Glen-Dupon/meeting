@@ -40,17 +40,12 @@ DEBUG = os.environ.get('IS_DEBUG', '1') != '0'
 
 ALLOWED_HOSTS = ['*', ]
 
-# redis://[:password]@hostname:port/db
-
-# REDIS_CACHE_URL = 'redis://%s%s%s:%s/%d' % (
-REDIS_CACHE_URL = 'redis://'+'%s%s%s:%s/%d' % (
-    ':' if ls.REDIS_PASSWORD else '',
-    ls.REDIS_PASSWORD+'@' if ls.REDIS_PASSWORD else '',
+REDIS_CACHE_URL = 'redis://'+'%s%s:%s/%d' % (
+    ('%s:%s@' % (ls.REDIS_USER, ls.REDIS_PASSWORD)) if ls.REDIS_PASSWORD else '',
     ls.REDIS_HOST,
     ls.REDIS_PORT,
-    ls.REDIS_CACHE_DB)
-
-# REDIS_CACHE_URL = 'redis://127.0.0.1:6379/0'
+    ls.REDIS_CACHE_DB
+)
 
 # Application definition
 
@@ -91,6 +86,16 @@ SESSION_REDIS = {
     'socket_timeout': 1
 }
 
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',
+#         'LOCATION': 'redis://127.0.0.1:6379/1',
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#         }
+#     }
+# }
+
 CACHES = {
     'default': {
         # Could not find backend 'redis_cache.RedisCache': cannot import name 'six' from 'django.utils'
@@ -100,12 +105,20 @@ CACHES = {
         "BACKEND": "django_redis.cache.RedisCache",
         
         'LOCATION': [
-            '%s:%s' % (ls.REDIS_HOST, ls.REDIS_PORT),
+            
+            #  bug
+            # '%s:%s' % (ls.REDIS_HOST, ls.REDIS_PORT),
+
+            'redis://'+'%s%s:%s/%d' % (
+                ('%s:%s@' % (ls.REDIS_USER, ls.REDIS_PASSWORD)) if ls.REDIS_PASSWORD else '',
+                ls.REDIS_HOST,
+                ls.REDIS_PORT,
+                ls.REDIS_CACHE_DB)
         ],
         'OPTIONS': {
             'DB': ls.REDIS_CACHE_DB,
             'PASSWORD': ls.REDIS_PASSWORD,
-            'PARSER_CLASS': 'redis.connection.HiredisParser',
+            'PARSER_CLASS': 'redis.connection._HiredisParser',
             'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
             'CONNECTION_POOL_CLASS_KWARGS': {
                 'max_connections': 50,
@@ -117,17 +130,16 @@ CACHES = {
     },
 }
 
-WSGI_APPLICATION = 'ballcall.wsgi.application'
-ASGI_APPLICATION = 'ballcall.routing.application'
+WSGI_APPLICATION = 'meeting.wsgi.application'
+ASGI_APPLICATION = 'meeting.routing.application'
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [
-                'redis://'+'%s%s%s:%s/%d' % (
-                    ':' if ls.REDIS_PASSWORD else '',
-                    ls.REDIS_PASSWORD+'@' if ls.REDIS_PASSWORD else '',
+                'redis://'+'%s%s:%s/%d' % (
+                    ('%s:%s@' % (ls.REDIS_USER, ls.REDIS_PASSWORD)) if ls.REDIS_PASSWORD else '',
                     ls.REDIS_HOST,
                     ls.REDIS_PORT,
                     ls.REDIS_CHANNEL_DB
@@ -161,7 +173,7 @@ DATABASES = {
         # },
 
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ballcalldb',
+        'NAME': 'meetingdb',
         'USER': 'postgres',
         'PASSWORD': '123456',
         'HOST': '127.0.0.1',
@@ -254,7 +266,7 @@ if DEBUG:
 
 EMAIL_SUBJECT_PREFIX = '[ballcall]'
 
-ROOT_URLCONF = 'ballcall.urls'
+ROOT_URLCONF = 'meeting.urls'
 
 DEFAULT_FILE_STORAGE = 'core.storages.EnableUrlFileSystemStorage'
 
@@ -346,12 +358,13 @@ STATICFILES_DIRS = (
 )
 # celery settings
 
-CELERY_BROKER_URL = 'redis://'+'%s%s%s:%s/%d' % (
-    ':' if ls.REDIS_PASSWORD else '',
-    ls.REDIS_PASSWORD+'@' if ls.REDIS_PASSWORD else '',
-    ls.REDIS_HOST,
-    ls.REDIS_PORT,
-    ls.REDIS_CELERY_DB)
+
+CELERY_BROKER_URL = 'redis://'+'%s%s:%s/%d' % (
+    ('%s:%s@' % (ls.REDIS_USER, ls.REDIS_PASSWORD)) if ls.REDIS_PASSWORD else '',
+                    ls.REDIS_HOST,
+                    ls.REDIS_PORT,
+                    ls.REDIS_CELERY_DB
+)
 
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
@@ -377,7 +390,7 @@ CELERY_TASK_QUEUES = (
 
 # 制定特定任务路由到特定执行队列
 CELERY_TASK_ROUTES = {
-    'ballcall.celery._async_call': {'queue': 'async', 'routing_key': 'async'},
+    'meeting.celery._async_call': {'queue': 'async', 'routing_key': 'async'},
 }
 
 CELERY_TASK_ANNOTATIONS = {'*': celery_annotations_dict}
@@ -391,11 +404,11 @@ DJANGO_COOL = {
     'API_ERROR_CODES': (
         ('ERR_WECHAT_LOGIN', (10001, '需要登录')),
 
-        ('ERR_ballcall_ROOM_TIMEOVER', (20001, '时间已过')),
-        ('ERR_ballcall_ROOM_INUSE', (20002, '时间冲突')),
-        ('ERR_ballcall_ROOM_NOT_FOUND', (20003, '会议室未找到')),
-        ('ERR_ballcall_NOT_FOUND', (20004, '会议未找到')),
-        ('ERR_ballcall_FINISHED', (20005, '会议已结束')),
+        ('ERR_meeting_ROOM_TIMEOVER', (20001, '时间已过')),
+        ('ERR_meeting_ROOM_INUSE', (20002, '时间冲突')),
+        ('ERR_meeting_ROOM_NOT_FOUND', (20003, '会议室未找到')),
+        ('ERR_meeting_NOT_FOUND', (20004, '会议未找到')),
+        ('ERR_meeting_FINISHED', (20005, '会议已结束')),
 
     )
 }
