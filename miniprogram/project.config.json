@@ -20,8 +20,8 @@
     "condition": false
   },
   "compileType": "miniprogram",
-  "libVersion": "3.4.1",
-  "appid": "wx696535edefb304bd",
+  "libVersion": "2.25.3",
+  "appid": "touristappid",
   "projectname": "meeting",
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
